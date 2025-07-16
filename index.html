@@ -107,12 +107,17 @@
 </div>
 
 <script>
-const solicitanteSenhas = {     "ADM": "00", "Isabela": "Kids25", "Rosa": "Rosa123", "Jaildes": "Jaildes25",
-    "Maurício": "Maurício26", "Jeanei": "Jeanei27", "Jhone": "Jhone29",
-    "Rafael": "Rafael25", "Edicleia": "Edicleia25", "Marizete": "Marizete25",
-    "Layra": "0509", "Gabriel": "Gabriel74", "Andrevan": "Andrevan35",
-    "Rickelves": "Rickelves98", "Elenice": "Kids26","Jakeline": "5670" /* ... */ };
-let unidadeSelecionada = '', enviados = JSON.parse(localStorage.getItem('enviados')) || [], senhaAutenticada = '';
+const solicitanteSenhas = {
+  "ADM": "00", "Isabela": "Kids25", "Rosa": "Rosa123", "Jaildes": "Jaildes25",
+  "Maurício": "Maurício26", "Jeanei": "Jeanei27", "Jhone": "Jhone29",
+  "Rafael": "Rafael25", "Edicleia": "Edicleia25", "Marizete": "Marizete25",
+  "Layra": "0509", "Gabriel": "Gabriel74", "Andrevan": "Andrevan35",
+  "Rickelves": "Rickelves98", "Elenice": "Kids26","Jakeline": "5670"
+};
+
+let unidadeSelecionada = '';
+let enviados = JSON.parse(localStorage.getItem('enviados')) || [];
+let senhaAutenticada = '';
 
 function selecionarUnidade(btn, valor) {
   unidadeSelecionada = valor;
@@ -130,6 +135,7 @@ document.getElementById('solicitante').addEventListener('change', () => {
     } else {
       senhaAutenticada = '';
       document.getElementById('msg').innerText = "❌ Senha incorreta!";
+      document.getElementById('solicitante').value = '';
     }
   }
 });
@@ -139,6 +145,7 @@ function enviarItem() {
   const setor = document.getElementById('setor').value.trim();
   const item = document.getElementById('item').value.trim();
   const quantidade = document.getElementById('quantidade').value.trim();
+  const observacoes = document.getElementById('observacoes').value.trim();
   const horaEnvio = new Date().toLocaleTimeString();
 
   if (!solicitante || !setor || !item || !quantidade || !unidadeSelecionada || !senhaAutenticada) {
@@ -150,7 +157,7 @@ function enviarItem() {
   document.getElementById('btn-enviar').disabled = true;
 
   enviados.push({ item, unidade: unidadeSelecionada, quantidade, setor, hora: horaEnvio, status: "Processando" });
-  localStorage.setItem('enviados', JSON.stringify(enviados));
+  save();
   atualizarTabela();
 
   const data = new URLSearchParams();
@@ -159,11 +166,34 @@ function enviarItem() {
   data.append('Quantidade', quantidade);
   data.append('Setor', setor);
   data.append('Solicitante', solicitante);
+  data.append('Observacoes', observacoes);
 
-  fetch('https://script.google.com/macros/s/AKfycby-FxQOpE72kublHwp7OZqBHtM01L4jokDA8oWn3FlGeWkRXwPSiCIAwZBKrMKMigPUOA/exec', { method: 'POST', body: data })
-    .then(() => { enviados[enviados.length-1].status = "Enviado"; save(); atualizarTabela(); })
-    .catch(() => { document.getElementById('msg').innerText = "⚠️ Verifique!"; })
-    .finally(() => { document.getElementById('spinner').style.display = 'none'; document.getElementById('btn-enviar').disabled = false; });
+  fetch('https://script.google.com/macros/s/AKfycby-FxQOpE72kublHwp7OZqBHtM01L4jokDA8oWn3FlGeWkRXwPSiCIAwZBKrMKMigPUOA/exec', {
+    method: 'POST',
+    body: data
+  })
+  .then(() => {
+    enviados[enviados.length - 1].status = "Enviado";
+    save();
+    atualizarTabela();
+    alert("✅ Item enviado com sucesso!");
+    limparCampos();
+  })
+  .catch(() => {
+    document.getElementById('msg').innerText = "⚠️ Verifique!";
+  })
+  .finally(() => {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('btn-enviar').disabled = false;
+  });
+}
+
+function limparCampos() {
+  document.getElementById('item').value = '';
+  document.getElementById('quantidade').value = '';
+  document.getElementById('observacoes').value = '';
+  unidadeSelecionada = '';
+  document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
 }
 
 function atualizarTabela() {
@@ -180,7 +210,9 @@ function atualizarTabela() {
   });
 }
 
-function save() { localStorage.setItem('enviados', JSON.stringify(enviados)); }
+function save() {
+  localStorage.setItem('enviados', JSON.stringify(enviados));
+}
 
 function limparTabela() {
   enviados = [];
@@ -190,7 +222,8 @@ function limparTabela() {
 
 function atualizarStatusPlanilha() {
   fetch('https://script.google.com/macros/s/AKfycby-FxQOpE72kublHwp7OZqBHtM01L4jokDA8oWn3FlGeWkRXwPSiCIAwZBKrMKMigPUOA/exec')
-    .then(r => r.json()).then(data => {
+    .then(r => r.json())
+    .then(data => {
       enviados.forEach(localItem => {
         const encontrado = data.find(r => r.Item === localItem.item);
         if (encontrado) localItem.status = encontrado.Status || localItem.status;
@@ -203,5 +236,6 @@ function atualizarStatusPlanilha() {
 setInterval(atualizarStatusPlanilha, 10000);
 atualizarTabela();
 </script>
+
 </body>
 </html>
