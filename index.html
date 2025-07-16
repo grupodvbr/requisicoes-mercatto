@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Requisição de Compras - MERCATTO DELÍCIA</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: Arial, sans-serif; background: #f5f5f5; display: flex; justify-content: center; padding: 30px; }
     .container { background: #fff; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); max-width: 500px; width: 100%; padding: 25px; position: relative; }
@@ -12,12 +12,6 @@
     input, select, textarea {
       width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;
     }
-    .autocomplete-list {
-      position: absolute; background: #fff; border: 1px solid #ddd; max-height: 150px;
-      overflow-y: auto; width: calc(100% - 52px); z-index: 10;
-    }
-    .autocomplete-item { padding: 8px; cursor: pointer; }
-    .autocomplete-item:hover { background: #f0f0f0; }
     .unidades { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
     .unidades button {
       flex: 1 1 25%; padding: 8px; font-size: 14px; border: 1px solid #2196F3; background: #fff; border-radius: 20px; cursor: pointer;
@@ -31,16 +25,11 @@
     .btn-red { background: #f44336; color: #fff; }
     #msg { text-align: center; margin-top: 10px; font-weight: bold; }
     #spinner {
-      display: none;
-      position: absolute;
-      top: 50%; left: 50%;
+      display: none; position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       border: 8px solid #f3f3f3;
-      border-top: 8px solid #2196F3;
-      border-radius: 50%;
-      width: 60px; height: 60px;
-      animation: spin 1s linear infinite;
-      z-index: 100;
+      border-top: 8px solid #2196F3; border-radius: 50%;
+      width: 60px; height: 60px; animation: spin 1s linear infinite; z-index: 100;
     }
     @keyframes spin {
       0% { transform: translate(-50%, -50%) rotate(0deg); }
@@ -50,7 +39,7 @@
 </head>
 <body>
 <div class="container">
-  <h2>Requisição de Compras</h2>
+  <h2>Requisição de predutos</h2>
 
   <label>Solicitante:</label>
   <select id="solicitante">
@@ -71,6 +60,7 @@
     <option value="Andrevan">Andrevan</option>
     <option value="Rickelves">Rickelves</option>
     <option value="Elenice">Elenice</option>
+    <!-- ... MANTÉM TODOS -->
   </select>
 
   <label>Setor:</label>
@@ -83,11 +73,11 @@
     <option value="Bar">Bar</option>
     <option value="Caixa">Caixa</option>
     <option value="Sushi">Sushi</option>
+    <!-- ... -->
   </select>
 
   <label>Produto:</label>
   <input type="text" id="item" placeholder="Digite o produto">
-  <div id="autocomplete-list" class="autocomplete-list"></div>
 
   <label>Quantidade:</label>
   <input type="number" id="quantidade" min="1">
@@ -95,146 +85,88 @@
   <label>Unidade de Medida:</label>
   <div class="unidades">
     <button type="button" onclick="selecionarUnidade(this, 'UN.')">UN.</button>
-    <button type="button" onclick="selecionarUnidade(this, 'CX')">CX</button>
-    <button type="button" onclick="selecionarUnidade(this, 'L')">L</button>
-    <button type="button" onclick="selecionarUnidade(this, 'PC')">PC</button>
-    <button type="button" onclick="selecionarUnidade(this, 'KG')">KG</button>
+    <button type="button" onclick="selecionarUnidade(this, 'UN.')">PC.</button>
+    <button type="button" onclick="selecionarUnidade(this, 'UN.')">L.</button>
+    <button type="button" onclick="selecionarUnidade(this, 'UN.')">KG.</button>
+    <button type="button" onclick="selecionarUnidade(this, 'CX')">CX.</button>
+    <!-- ... -->
   </div>
 
   <label>Observações:</label>
   <textarea id="observacoes" placeholder="Observações gerais"></textarea>
 
-  <!-- Spinner -->
   <div id="spinner"></div>
-
-  <!-- BOTÕES -->
   <button id="btn-enviar" class="btn-blue" onclick="enviarItem()">ENVIAR ITEM</button>
   <button class="btn-red" onclick="limparTabela()">LIMPAR HISTÓRICO</button>
-
   <p id="msg"></p>
 
   <h3>Itens enviados nesta sessão:</h3>
   <table id="historico">
-    <tr><th>Produto</th><th>Unidade</th><th>Qtd</th><th>Setor</th><th>Hora</th></tr>
+    <tr><th>Produto</th><th>Unidade</th><th>Qtd</th><th>Setor</th><th>Hora</th><th>Status</th></tr>
   </table>
 </div>
 
 <script>
-  const solicitanteSenhas = {
-    "ADM": "00", "Isabela": "Kids25", "Rosa": "Rosa123", "Jaildes": "Jaildes25",
+const solicitanteSenhas = {     "ADM": "00", "Isabela": "Kids25", "Rosa": "Rosa123", "Jaildes": "Jaildes25",
     "Maurício": "Maurício26", "Jeanei": "Jeanei27", "Jhone": "Jhone29",
     "Rafael": "Rafael25", "Edicleia": "Edicleia25", "Marizete": "Marizete25",
     "Layra": "0509", "Gabriel": "Gabriel74", "Andrevan": "Andrevan35",
-    "Rickelves": "Rickelves98", "Elenice": "Kids26","Jakeline": "5670"
-  };
+    "Rickelves": "Rickelves98", "Elenice": "Kids26","Jakeline": "5670" /* ... */ };
+let unidadeSelecionada = '', enviados = JSON.parse(localStorage.getItem('enviados')) || [], senhaAutenticada = '';
 
-  let produtos = [];
-  let unidadeSelecionada = '';
-  let enviados = [];
-  let senhaAutenticada = '';
+function selecionarUnidade(btn, valor) {
+  unidadeSelecionada = valor;
+  document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+}
 
-  const itemInput = document.getElementById('item');
-  const autocompleteList = document.getElementById('autocomplete-list');
-  const solicitanteInput = document.getElementById('solicitante');
-
-  fetch("https://script.google.com/macros/s/YOUR_AUTOCOMPLETE_API/exec")
-    .then(r => r.json()).then(data => produtos = data);
-
-  itemInput.addEventListener('input', () => {
-    const val = itemInput.value.toLowerCase();
-    autocompleteList.innerHTML = '';
-    if (!val) return;
-    produtos.filter(p => p.toLowerCase().includes(val)).forEach(p => {
-      const div = document.createElement('div');
-      div.classList.add('autocomplete-item');
-      div.textContent = p;
-      div.onclick = () => { itemInput.value = p; autocompleteList.innerHTML = ''; };
-      autocompleteList.appendChild(div);
-    });
-  });
-
-  document.addEventListener('click', e => { if (e.target !== itemInput) autocompleteList.innerHTML = ''; });
-
-  function selecionarUnidade(btn, valor) {
-    unidadeSelecionada = valor;
-    document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
-    btn.classList.add('ativo');
-  }
-
-  solicitanteInput.addEventListener('change', () => {
-    const solicitante = solicitanteInput.value.trim();
-    if (solicitante) {
-      const senha = prompt(`Digite a senha para ${solicitante}:`);
-      if (senha === solicitanteSenhas[solicitante]) {
-        senhaAutenticada = senha;
-        document.getElementById('msg').innerText = "✅ Solicitante autenticado!";
-      } else {
-        solicitanteInput.value = '';
-        senhaAutenticada = '';
-        document.getElementById('msg').innerText = "❌ Senha incorreta!";
-      }
+document.getElementById('solicitante').addEventListener('change', () => {
+  const s = document.getElementById('solicitante').value;
+  if (s) {
+    const senha = prompt(`Digite a senha para ${s}:`);
+    if (senha === solicitanteSenhas[s]) {
+      senhaAutenticada = senha;
+      document.getElementById('msg').innerText = "✅ Autenticado!";
+    } else {
+      senhaAutenticada = '';
+      document.getElementById('msg').innerText = "❌ Senha incorreta!";
     }
-  });
+  }
+});
 
 function enviarItem() {
-  const solicitante = solicitanteInput.value.trim();
+  const solicitante = document.getElementById('solicitante').value.trim();
   const setor = document.getElementById('setor').value.trim();
-  const item = itemInput.value.trim();
+  const item = document.getElementById('item').value.trim();
   const quantidade = document.getElementById('quantidade').value.trim();
-  const observacoes = document.getElementById('observacoes').value.trim();
+  const horaEnvio = new Date().toLocaleTimeString();
 
   if (!solicitante || !setor || !item || !quantidade || !unidadeSelecionada || !senhaAutenticada) {
-    document.getElementById('msg').innerText = "⚠️ Preencha todos os campos e autentique!";
+    document.getElementById('msg').innerText = "⚠️ Preencha tudo!";
     return;
   }
 
   document.getElementById('spinner').style.display = 'block';
   document.getElementById('btn-enviar').disabled = true;
 
-  const horaEnvio = new Date().toLocaleTimeString();
-
-  // Adiciona no histórico imediatamente como PROCESSANDO
   enviados.push({ item, unidade: unidadeSelecionada, quantidade, setor, hora: horaEnvio, status: "Processando" });
+  localStorage.setItem('enviados', JSON.stringify(enviados));
   atualizarTabela();
 
   const data = new URLSearchParams();
-  data.append('tipoFormulario', 'Requisição');
   data.append('Item', item);
   data.append('Unidade', unidadeSelecionada);
   data.append('Quantidade', quantidade);
   data.append('Setor', setor);
   data.append('Solicitante', solicitante);
-  data.append('Observacoes', observacoes);
 
-  fetch('https://script.google.com/macros/s/AKfycbxVc95pHMUY7IqJLTJgOd__4gybg5ttTS5ps4WKpqlxjD1jL7HNHwr-QGwEH8oiijHE/exec', {
-    method: 'POST',
-    body: data
-  })
-  .then(r => r.text())
-  .then(txt => {
-    document.getElementById('msg').innerText = "✅ Item enviado!";
-    // Atualiza status do último item
-    enviados[enviados.length - 1].status = "Enviado";
-    atualizarTabela();
-    itemInput.value = '';
-    document.getElementById('quantidade').value = '';
-    unidadeSelecionada = '';
-    document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
-    document.getElementById('spinner').style.display = 'none';
-    document.getElementById('btn-enviar').disabled = false;
-  })
-  .catch(err => {
-    console.error(err);
-    document.getElementById('msg').innerText = "Enviado, favor confirmar com o setor!";
-    // Mantém status como "Processando"
-    atualizarTabela();
-    document.getElementById('spinner').style.display = 'none';
-    document.getElementById('btn-enviar').disabled = false;
-  });
+  fetch('https://script.google.com/macros/s/AKfycby-FxQOpE72kublHwp7OZqBHtM01L4jokDA8oWn3FlGeWkRXwPSiCIAwZBKrMKMigPUOA/exec', { method: 'POST', body: data })
+    .then(() => { enviados[enviados.length-1].status = "Enviado"; save(); atualizarTabela(); })
+    .catch(() => { document.getElementById('msg').innerText = "⚠️ Verifique!"; })
+    .finally(() => { document.getElementById('spinner').style.display = 'none'; document.getElementById('btn-enviar').disabled = false; });
 }
 
-
- function atualizarTabela() {
+function atualizarTabela() {
   const tabela = document.getElementById('historico');
   tabela.innerHTML = `<tr><th>Produto</th><th>Unidade</th><th>Qtd</th><th>Setor</th><th>Hora</th><th>Status</th></tr>`;
   enviados.forEach(i => {
@@ -244,16 +176,32 @@ function enviarItem() {
     row.insertCell(2).innerText = i.quantidade;
     row.insertCell(3).innerText = i.setor;
     row.insertCell(4).innerText = i.hora;
-    row.insertCell(5).innerText = i.status || "Processando";
+    row.insertCell(5).innerText = i.status;
   });
 }
 
+function save() { localStorage.setItem('enviados', JSON.stringify(enviados)); }
 
-  function limparTabela() {
-    enviados = [];
-    atualizarTabela();
-    document.getElementById('msg').innerText = "🗑️ Histórico limpo!";
-  }
+function limparTabela() {
+  enviados = [];
+  save();
+  atualizarTabela();
+}
+
+function atualizarStatusPlanilha() {
+  fetch('https://script.google.com/macros/s/AKfycby-FxQOpE72kublHwp7OZqBHtM01L4jokDA8oWn3FlGeWkRXwPSiCIAwZBKrMKMigPUOA/exec')
+    .then(r => r.json()).then(data => {
+      enviados.forEach(localItem => {
+        const encontrado = data.find(r => r.Item === localItem.item);
+        if (encontrado) localItem.status = encontrado.Status || localItem.status;
+      });
+      save();
+      atualizarTabela();
+    });
+}
+
+setInterval(atualizarStatusPlanilha, 10000);
+atualizarTabela();
 </script>
 </body>
 </html>
