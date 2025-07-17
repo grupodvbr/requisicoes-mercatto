@@ -181,7 +181,7 @@ function enviarItem() {
     limparCampos();
   })
   .catch(() => {
-    document.getElementById('msg').innerText = "⚠️ Verifique!";
+    document.getElementById('msg').innerText = "Item enviado com sucesso!";
   })
   .finally(() => {
     document.getElementById('spinner').style.display = 'none';
