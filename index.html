@@ -168,7 +168,7 @@ function enviarItem() {
   data.append('Solicitante', solicitante);
   data.append('Observacoes', observacoes);
 
- fetch('https://script.google.com/macros/s/AKfycby-FxQOpE72kublHwp7OZqBHtM01L4jokDA8oWn3FlGeWkRXwPSiCIAwZBKrMKMigPUOA/exec', {
+ fetch('https://script.google.com/macros/s/AKfycbxk5CVDcrdUj546keN0l7p5EKNvSATgQaOuW5D4PdxmN2CESNFrLABOWCMrattDYl1qjQ/exec', {
     method: 'POST',
     body: data
   })
@@ -221,7 +221,7 @@ function limparTabela() {
 }
 
 function atualizarStatusPlanilha() {
-  fetch('https://script.google.com/macros/s/AKfycby-FxQOpE72kublHwp7OZqBHtM01L4jokDA8oWn3FlGeWkRXwPSiCIAwZBKrMKMigPUOA/exec')
+  fetch('https://script.google.com/macros/s/AKfycbxk5CVDcrdUj546keN0l7p5EKNvSATgQaOuW5D4PdxmN2CESNFrLABOWCMrattDYl1qjQ/exec')
     .then(r => r.json())
     .then(data => {
       enviados.forEach(localItem => {
