@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Requisição de Compras  MERCATTO DELÍCIA</title>
+  <title>Requisição de Compras - MERCATTO DELÍCIA</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: Arial, sans-serif; background: #f5f5f5; display: flex; justify-content: center; padding: 30px; }
@@ -60,11 +60,11 @@
     <option value="Andrevan">Andrevan</option>
     <option value="Rickelves">Rickelves</option>
     <option value="Elenice">Elenice</option>
-    <!-- ... MANTÉM TODOS -->
   </select>
 
   <label>Setor:</label>
   <select id="setor">
+    <option value="">Selecione o setor</option>
     <option value="Cozinha">Cozinha</option>
     <option value="Parrila">Parrila</option>
     <option value="Confeitaria">Confeitaria</option>
@@ -72,9 +72,7 @@
     <option value="M. Kids">M. Kids</option>
     <option value="Bar">Bar</option>
     <option value="Caixa">Caixa</option>
-    <option value="Pizzaria">Pizzaria</option>
     <option value="Sushi">Sushi</option>
-    <!-- ... -->
   </select>
 
   <label>Produto:</label>
@@ -86,11 +84,10 @@
   <label>Unidade de Medida:</label>
   <div class="unidades">
     <button type="button" onclick="selecionarUnidade(this, 'UN.')">UN.</button>
-    <button type="button" onclick="selecionarUnidade(this, 'UN.')">PC.</button>
-    <button type="button" onclick="selecionarUnidade(this, 'UN.')">L.</button>
-    <button type="button" onclick="selecionarUnidade(this, 'UN.')">KG.</button>
-    <button type="button" onclick="selecionarUnidade(this, 'CX')">CX.</button>
-    <!-- ... -->
+    <button type="button" onclick="selecionarUnidade(this, 'PC.')">PC.</button>
+    <button type="button" onclick="selecionarUnidade(this, 'L.')">L.</button>
+    <button type="button" onclick="selecionarUnidade(this, 'KG.')">KG.</button>
+    <button type="button" onclick="selecionarUnidade(this, 'CX.')">CX.</button>
   </div>
 
   <label>Observações:</label>
@@ -113,7 +110,7 @@ const solicitanteSenhas = {
   "Maurício": "Maurício26", "Jeanei": "Jeanei27", "Jhone": "Jhone29",
   "Rafael": "Rafael25", "Edicleia": "Edicleia25", "Marizete": "Marizete25",
   "Layra": "0509", "Gabriel": "Gabriel74", "Andrevan": "Andrevan35",
-  "Rickelves": "Rickelves98", "Elenice": "Kids26","Jakeline": "5670"
+  "Rickelves": "Rickelves98", "Elenice": "Kids26", "Jakeline": "5670"
 };
 
 let unidadeSelecionada = '';
@@ -169,7 +166,7 @@ function enviarItem() {
   data.append('Solicitante', solicitante);
   data.append('Observacoes', observacoes);
 
-  fetch('https://script.google.com/macros/s/AKfycbxk5CVDcrdUj546keN0l7p5EKNvSATgQaOuW5D4PdxmN2CESNFrLABOWCMrattDYl1qjQ/exec', {
+  fetch('https://script.google.com/macros/s/AKfycby-FxQOpE72kublHwp7OZqBHtM01L4jokDA8oWn3FlGeWkRXwPSiCIAwZBKrMKMigPUOA/exec', {
     method: 'POST',
     body: data
   })
@@ -181,7 +178,7 @@ function enviarItem() {
     limparCampos();
   })
   .catch(() => {
-    document.getElementById('msg').innerText = "Item enviado com sucesso!";
+    document.getElementById('msg').innerText = "⚠️ Verifique!";
   })
   .finally(() => {
     document.getElementById('spinner').style.display = 'none';
@@ -222,7 +219,7 @@ function limparTabela() {
 }
 
 function atualizarStatusPlanilha() {
-  fetch('https://script.google.com/macros/s/AKfycbyT89NfPdVbzrTKdVe1zExnfqjwFdMyVkMhjNtW5-DCOlhmSsBz7139bK-d2KbbdBjkwg/exec')
+  fetch('https://script.google.com/macros/s/AKfycby-FxQOpE72kublHwp7OZqBHtM01L4jokDA8oWn3FlGeWkRXwPSiCIAwZBKrMKMigPUOA/exec')
     .then(r => r.json())
     .then(data => {
       enviados.forEach(localItem => {
@@ -237,6 +234,5 @@ function atualizarStatusPlanilha() {
 setInterval(atualizarStatusPlanilha, 10000);
 atualizarTabela();
 </script>
-
 </body>
 </html>
