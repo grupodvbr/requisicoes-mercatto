@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Admin – Usuários Requisições</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  padding:20px;
+  background:#f2f4f7;
+  font-family:Arial,sans-serif;
+}
+h1{
+  text-align:center;
+  color:#0b1e39;
+}
+.container{
+  max-width:600px;
+  margin:0 auto;
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 4px 20px rgba(0,0,0,.1);
+}
+label{font-weight:bold;margin-top:10px;display:block;}
+input{
+  width:100%;
+  padding:10px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  margin-bottom:10px;
+}
+button{
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:8px;
+  margin-top:5px;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:16px;
+}
+.btn-blue{background:#0b1e39;color:#fff;}
+.btn-red{background:#c0392b;color:#fff;}
+table{
+  width:100%;
+  margin-top:20px;
+  border-collapse:collapse;
+}
+th,td{
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:center;
+}
+th{
+  background:#0b1e39;
+  color:#fff;
+}
+</style>
+</head>
+<body>
+
+<h1>Administração de Usuários</h1>
+
+<div class="container">
+
+  <label>Nome:</label>
+  <input type="text" id="nome">
+
+  <label>Senha:</label>
+  <input type="text" id="senha">
+
+  <button class="btn-blue" onclick="addUser()">Adicionar Usuário</button>
+  <p id="msg"></p>
+
+  <h3>Usuários Registrados:</h3>
+  <table id="tabela">
+    <tr><th>Nome</th><th>Senha</th><th>Ações</th></tr>
+  </table>
+</div>
+
+<script>
+const URL_GAS = "https://script.google.com/macros/s/AKfycbxwexTC8L2T_St6LWSbkYpkWQnvF8wdYJGWAiZvkqvMOp_VPZLmTC9HlE0DGx8hFoO82g/exec"; // NECESSÁRIO ALTERAR
+
+function loadUsers(){
+  fetch(URL_GAS)
+  .then(r=>r.json())
+  .then(lista=>{
+    const tabela = document.getElementById("tabela");
+    tabela.innerHTML = `<tr><th>Nome</th><th>Senha</th><th>Ações</th></tr>`;
+    
+    lista.forEach(u=>{
+      let tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${u.nome}</td>
+        <td>${u.senha}</td>
+        <td>
+          <button class="btn-blue" onclick="editUser('${u.nome}')">Editar</button>
+          <button class="btn-red" onclick="deleteUser('${u.nome}')">Excluir</button>
+        </td>`;
+      tabela.appendChild(tr);
+    });
+  });
+}
+
+function addUser(){
+  const nome = document.getElementById("nome").value.trim();
+  const senha = document.getElementById("senha").value.trim();
+
+  if(!nome || !senha){
+    msg("Preencha tudo!");
+    return;
+  }
+
+  fetch(URL_GAS, {
+    method:"POST",
+    body: new URLSearchParams({
+      acao:"add",
+      nome,
+      senha
+    })
+  })
+  .then(r=>r.json())
+  .then(r=>{
+    msg(r.msg || r.erro);
+    loadUsers();
+  });
+}
+
+function editUser(nome){
+  const novaSenha = prompt(`Nova senha para ${nome}:`);
+  if(!novaSe
