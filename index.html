@@ -24,6 +24,8 @@
     .btn-blue { background: #2196F3; color: #fff; }
     .btn-red { background: #f44336; color: #fff; }
     #msg { text-align: center; margin-top: 10px; font-weight: bold; }
+
+    /* SPINNER CENTRAL */
     #spinner {
       display: none; position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
@@ -31,14 +33,46 @@
       border-top: 8px solid #2196F3; border-radius: 50%;
       width: 60px; height: 60px; animation: spin 1s linear infinite; z-index: 100;
     }
+
+    /* 🔵 OVERLAY DE CARREGAMENTO DOS USUÁRIOS */
+    #overlayUsuarios {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #0b1e39;
+    }
+
+    #overlayUsuarios span {
+      animation: pulse 1s infinite alternate;
+    }
+
     @keyframes spin {
       0% { transform: translate(-50%, -50%) rotate(0deg); }
       100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0% { opacity: .4; }
+      100% { opacity: 1; }
     }
   </style>
 </head>
 <body>
 <div class="container">
+
+  <!-- OVERLAY DOS USUÁRIOS -->
+  <div id="overlayUsuarios">
+    <span>Carregando usuários...</span>
+  </div>
+
   <h2>Requisição de produtos</h2>
 
   <label>Solicitante:</label>
@@ -90,16 +124,19 @@
 </div>
 
 <script>
-let solicitanteSenhas = {}; // ← VIRÁ DA PLANILHA
+let solicitanteSenhas = {}; 
 let unidadeSelecionada = '';
 let enviados = JSON.parse(localStorage.getItem('enviados')) || [];
 let senhaAutenticada = '';
 
-const URL_SENHAS = "https://script.google.com/macros/s/AKfycbwFQP8Pt1WvWREy8VduXb5pGLHCzI1i3Fqzi0bG2pjSOSeX_Ic9IvM87_9lzlViyjGx6w/exec"; // ← TROQUE AQUI
+const URL_SENHAS = "https://script.google.com/macros/s/AKfycbwFQP8Pt1WvWREy8VduXb5pGLHCzI1i3Fqzi0bG2pjSOSeX_Ic9IvM87_9lzlViyjGx6w/exec";
 
-// ========================================
-// 1) CARREGAR USUÁRIOS E SENHAS DA PLANILHA
-// ========================================
+// MOSTRAR OVERLAY AO CLICAR NO SELECT
+document.getElementById("solicitante").addEventListener("click", () => {
+  document.getElementById("overlayUsuarios").style.display = "flex";
+});
+
+// CARREGA OS USUÁRIOS
 function carregarUsuarios() {
   fetch(URL_SENHAS)
     .then(r => r.json())
@@ -115,11 +152,18 @@ function carregarUsuarios() {
         op.textContent = u.nome;
         select.appendChild(op);
       });
+
+      // ESCONDE O OVERLAY
+      document.getElementById("overlayUsuarios").style.display = "none";
     })
-    .catch(() => alert("Erro ao carregar usuários da planilha."));
+    .catch(() => {
+      alert("Erro ao carregar usuários da planilha.");
+      document.getElementById("overlayUsuarios").style.display = "none";
+    });
 }
 
-// ========================================
+// RESTANTE DO SEU SCRIPT IGUAL
+
 function selecionarUnidade(btn, valor) {
   unidadeSelecionada = valor;
   document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
@@ -221,8 +265,10 @@ function limparTabela() {
   atualizarTabela();
 }
 
-carregarUsuarios();  
+// 🔵 Iniciar carregamento automaticamente
+carregarUsuarios();
 atualizarTabela();
+
 </script>
 
 </body>
