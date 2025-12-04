@@ -44,29 +44,6 @@
   <label>Solicitante:</label>
   <select id="solicitante">
     <option value="">Selecione o solicitante</option>
-    <option value="ADM">ADM</option>
-    <option value="Limpeza">Limpeza</option>
-    <option value="Isabela">Isabela</option>
-    <option value="Rosa">Rosa</option>
-    <option value="Maurício">Maurício</option>
-    <option value="Jaildes">Jaildes</option>
-    <option value="Edicleia">Edicleia</option>
-    <option value="Layra">Layra</option>
-    <option value="Jhone">Jhone</option>
-    <option value="Matheus Souza">Matheus Souza</option>
-    <option value="Larisse">Larisse</option>
-    <option value="Matheus">Matheus</option>
-    <option value="Jeanei">Jeanei</option>
-    <option value="Jakeline">Jakeline</option>
-    <option value="Gabriel">Gabriel</option>
-    <option value="Andrevan">Andrevan</option>
-    <option value="Rickelves">Rickelves</option>
-    <option value="Elenice">Elenice</option>
-    <option value="Duda">Duda</option>
-    <option value="Ueliton">Ueliton</option>
-    <option value="Emanuela">Emanuela</option>
-    
-    <!-- ... MANTÉM TODOS -->
   </select>
 
   <label>Setor:</label>
@@ -81,7 +58,6 @@
     <option value="Garçons">Garçons</option>
     <option value="Sushi">Sushi</option>
     <option value="Buffet">Buffet</option>
-    <!-- ... -->
   </select>
 
   <label>Produto:</label>
@@ -97,7 +73,6 @@
     <button type="button" onclick="selecionarUnidade(this, 'L.')">L.</button>
     <button type="button" onclick="selecionarUnidade(this, 'KG.')">KG.</button>
     <button type="button" onclick="selecionarUnidade(this, 'CX')">CX.</button>
-    <!-- ... -->
   </div>
 
   <label>Observações:</label>
@@ -115,18 +90,36 @@
 </div>
 
 <script>
-const solicitanteSenhas = {
-  "ADM": "00", "Isabela": "Kids25", "Rosa": "Rosa123", "Jaildes": "Jaildes25", "Matheus Souza": "1999",
-  "Maurício": "Maurício26", "Jeanei": "Jeanei27", "Jhone": "Jhone29",
-  "Matheus": "Matheus24", "Edicleia": "Edicleia25", "Larisse": "Larisse25",
-  "Layra": "0509", "Gabriel": "Gabriel74", "Andrevan": "Andrevan35",
-  "Rickelves": "Rickelves98", "Elenice": "Kids26", "Jakeline": "5670", "Ueliton": "1014", "Duda": "1080",  "Limpeza": "7756", "Emanuela": "8978"
-};
-
+let solicitanteSenhas = {}; // ← VIRÁ DA PLANILHA
 let unidadeSelecionada = '';
 let enviados = JSON.parse(localStorage.getItem('enviados')) || [];
 let senhaAutenticada = '';
 
+const URL_SENHAS = "https://script.google.com/macros/s/AKfycbxwexTC8L2T_St6LWSbkYpkWQnvF8wdYJGWAiZvkqvMOp_VPZLmTC9HlE0DGx8hFoO82g/exec"; // ← TROQUE AQUI
+
+// ========================================
+// 1) CARREGAR USUÁRIOS E SENHAS DA PLANILHA
+// ========================================
+function carregarUsuarios() {
+  fetch(URL_SENHAS)
+    .then(r => r.json())
+    .then(data => {
+      solicitanteSenhas = {};
+      const select = document.getElementById("solicitante");
+
+      data.forEach(u => {
+        solicitanteSenhas[u.nome] = u.senha;
+
+        const op = document.createElement("option");
+        op.value = u.nome;
+        op.textContent = u.nome;
+        select.appendChild(op);
+      });
+    })
+    .catch(() => alert("Erro ao carregar usuários da planilha."));
+}
+
+// ========================================
 function selecionarUnidade(btn, valor) {
   unidadeSelecionada = valor;
   document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
@@ -188,7 +181,7 @@ function enviarItem() {
     limparCampos();
   })
   .catch(() => {
-    document.getElementById('msg').innerText = "✅ Item enviado com sucesso!";
+    document.getElementById('msg').innerText = "Erro ao enviar.";
   })
   .finally(() => {
     document.getElementById('spinner').style.display = 'none';
@@ -228,20 +221,7 @@ function limparTabela() {
   atualizarTabela();
 }
 
-function atualizarStatusPlanilha() {
-  fetch('https://script.google.com/macros/s/AKfycbxk5CVDcrdUj546keN0l7p5EKNvSATgQaOuW5D4PdxmN2CESNFrLABOWCMrattDYl1qjQ/exec')
-    .then(r => r.json())
-    .then(data => {
-      enviados.forEach(localItem => {
-        const encontrado = data.find(r => r.Item === localItem.item);
-        if (encontrado) localItem.status = encontrado.Status || localItem.status;
-      });
-      save();
-      atualizarTabela();
-    });
-}
-
-setInterval(atualizarStatusPlanilha, 10000);
+carregarUsuarios();  
 atualizarTabela();
 </script>
 
