@@ -3,103 +3,231 @@
 <head>
 <meta charset="UTF-8">
 <title>Admin – Usuários Requisições</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- BLOQUEAR ZOOM EM CELULAR -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 <style>
-body{
-  margin:0;
-  padding:20px;
-  background:#f2f4f7;
-  font-family:Arial,sans-serif;
+/* =======================================================
+   PALETA PREMIUM GRUPO DV (Azul + Dourado)
+======================================================= */
+:root {
+  --bg: #eef2f7;
+  --card: #ffffff;
+  --azul: #0b1e39;
+  --azul-claro: #15345c;
+  --dourado: #c9a86c;
+  --line: #d4d9e1;
+  --shadow: 0 10px 35px rgba(0,0,0,.12);
+  --radius: 14px;
 }
-h1{
-  text-align:center;
-  color:#0b1e39;
+
+/* =======================================================
+   BASE DO LAYOUT
+======================================================= */
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  font-family: "Inter", sans-serif;
 }
-.container{
-  max-width:600px;
-  margin:0 auto;
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-  box-shadow:0 4px 20px rgba(0,0,0,.1);
+
+header {
+  background: var(--azul);
+  color: #fff;
+  padding: 25px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  box-shadow: 0 4px 18px rgba(0,0,0,.2);
 }
-label{font-weight:bold;margin-top:10px;display:block;}
-input{
-  width:100%;
-  padding:10px;
-  border:1px solid #ccc;
-  border-radius:8px;
-  margin-bottom:10px;
+
+.container {
+  max-width: 1100px;
+  margin: 35px auto;
+  padding: 25px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
-button{
-  padding:10px;
-  width:100%;
-  border:none;
-  border-radius:8px;
-  margin-top:5px;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:16px;
+
+/* =======================================================
+   FORMULÁRIO DE CADASTRO
+======================================================= */
+.card-form {
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  margin-bottom: 25px;
 }
-.btn-blue{background:#0b1e39;color:#fff;}
-.btn-red{background:#c0392b;color:#fff;}
-table{
-  width:100%;
-  margin-top:20px;
-  border-collapse:collapse;
+
+label {
+  font-weight: 600;
+  margin-top: 12px;
+  display: block;
+  color: var(--azul);
 }
-th,td{
-  border:1px solid #ddd;
-  padding:8px;
-  text-align:center;
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  font-size: 16px;
+  margin-top: 5px;
+  background: #f9fafc;
 }
-th{
-  background:#0b1e39;
-  color:#fff;
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: none;
+  transition: .2s;
+}
+
+.btn-blue {
+  background: var(--azul);
+  color: #fff;
+}
+.btn-blue:hover { background: var(--azul-claro); }
+
+.btn-red {
+  background: #c0392b;
+  color: #fff;
+}
+.btn-red:hover { background: #992d22; }
+
+#msg {
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--azul);
+}
+
+/* =======================================================
+   TABELA PROFISSIONAL
+======================================================= */
+.table-box {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th {
+  background: var(--azul);
+  color: #fff;
+  padding: 12px;
+  font-size: 15px;
+}
+
+td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+}
+
+/* Botões pequenos nas ações */
+.table-btn-blue {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--azul);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+}
+.table-btn-red {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #c0392b;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+}
+
+.table-btn-blue:hover { background: var(--azul-claro); }
+.table-btn-red:hover { background: #992d22; }
+
+/* =======================================================
+   RESPONSIVIDADE
+======================================================= */
+@media (max-width: 768px) {
+  header { font-size: 23px; padding: 18px; }
+  .container { margin: 15px; padding: 20px; }
 }
 </style>
 </head>
+
 <body>
 
-<h1>Administração de Usuários</h1>
+<header>Administração de Usuários</header>
 
 <div class="container">
 
-  <label>Nome:</label>
-  <input type="text" id="nome">
+  <!-- CARD DE CADASTRO -->
+  <div class="card-form">
+    <h2 style="margin-top: 0; color: var(--azul);">Cadastrar Novo Usuário</h2>
 
-  <label>Senha:</label>
-  <input type="text" id="senha">
+    <label>Nome do usuário</label>
+    <input type="text" id="nome" placeholder="Ex.: Isabela, ADM, Matheus">
 
-  <button class="btn-blue" onclick="addUser()">Adicionar Usuário</button>
-  <p id="msg"></p>
+    <label>Senha</label>
+    <input type="text" id="senha" placeholder="Digite a senha">
 
-  <h3>Usuários Registrados:</h3>
-  <table id="tabela">
-    <tr><th>Nome</th><th>Senha</th><th>Ações</th></tr>
-  </table>
+    <button class="btn-blue" onclick="addUser()">Adicionar Usuário</button>
+    <div id="msg"></div>
+  </div>
+
+  <!-- TABELA -->
+  <h2 style="color: var(--azul);">Usuários Cadastrados</h2>
+  <div class="table-box">
+    <table id="tabela">
+      <tr>
+        <th>Nome</th>
+        <th>Senha</th>
+        <th>Ações</th>
+      </tr>
+    </table>
+  </div>
+
 </div>
 
 <script>
-const URL_GAS = "https://script.google.com/macros/s/AKfycbxwexTC8L2T_St6LWSbkYpkWQnvF8wdYJGWAiZvkqvMOp_VPZLmTC9HlE0DGx8hFoO82g/exec"; // NECESSÁRIO ALTERAR
+const URL_GAS = "https://script.google.com/macros/s/AKfycbxwexTC8L2T_St6LWSbkYpkWQnvF8wdYJGWAiZvkqvMOp_VPZLmTC9HlE0DGx8hFoO82g/exec";
 
 function loadUsers(){
   fetch(URL_GAS)
   .then(r=>r.json())
   .then(lista=>{
     const tabela = document.getElementById("tabela");
-    tabela.innerHTML = `<tr><th>Nome</th><th>Senha</th><th>Ações</th></tr>`;
-    
+    tabela.innerHTML = `
+      <tr>
+        <th>Nome</th>
+        <th>Senha</th>
+        <th>Ações</th>
+      </tr>`;
+
     lista.forEach(u=>{
       let tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${u.nome}</td>
         <td>${u.senha}</td>
         <td>
-          <button class="btn-blue" onclick="editUser('${u.nome}')">Editar</button>
-          <button class="btn-red" onclick="deleteUser('${u.nome}')">Excluir</button>
-        </td>`;
+          <button class="table-btn-blue" onclick="editUser('${u.nome}')">Editar</button>
+          <button class="table-btn-red" onclick="deleteUser('${u.nome}')">Excluir</button>
+        </td>
+      `;
       tabela.appendChild(tr);
     });
   });
@@ -110,7 +238,7 @@ function addUser(){
   const senha = document.getElementById("senha").value.trim();
 
   if(!nome || !senha){
-    msg("Preencha tudo!");
+    msg("Preencha todos os campos.");
     return;
   }
 
