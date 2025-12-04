@@ -131,4 +131,46 @@ function addUser(){
 
 function editUser(nome){
   const novaSenha = prompt(`Nova senha para ${nome}:`);
-  if(!novaSe
+  if(!novaSenha) return;
+
+  fetch(URL_GAS, {
+    method:"POST",
+    body: new URLSearchParams({
+      acao:"update",
+      nome,
+      senha:novaSenha
+    })
+  })
+  .then(r=>r.json())
+  .then(r=>{
+    msg(r.msg || r.erro);
+    loadUsers();
+  });
+}
+
+function deleteUser(nome){
+  if(!confirm("Excluir usuário?")) return;
+
+  fetch(URL_GAS, {
+    method:"POST",
+    body: new URLSearchParams({
+      acao:"delete",
+      nome
+    })
+  })
+  .then(r=>r.json())
+  .then(r=>{
+    msg(r.msg || r.erro);
+    loadUsers();
+  });
+}
+
+function msg(t){
+  document.getElementById("msg").textContent = t;
+}
+
+loadUsers();
+</script>
+
+</body>
+</html>
